@@ -18,15 +18,6 @@ export const isAuthenticated = async (req, res, next) => {
       req.user = response;
       next();
     });
-    if (!decodedToken) {
-      return res
-        .status(401)
-        .send({ status: false, msg: "Authentication failed" });
-    } else {
-      // Set the user ID in the request object
-      req.user = decodedToken.userId;
-    }
-    next();
   } catch (err) {
     res.status(500).send({ status: false, msg: err.message });
   }

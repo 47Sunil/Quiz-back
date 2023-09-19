@@ -6,7 +6,7 @@ import { isValid, isValidObjectId } from "../utils/regex.js";
 
 export const answerQuestion = async (req, res) => {
   try {
-    const userId = req.user;
+    const { userId } = req.user;
     const { roomId, questionId, selectedOption } = req.body;
     if (!Object.keys(req.body).length) {
       return res.status(400).json({
@@ -107,7 +107,7 @@ export const answerQuestion = async (req, res) => {
 
 export const getUserReport = async (req, res) => {
   try {
-    const userId = req.user;
+    const { userId } = req.user;
     const roomId = req.params.roomId;
 
     if (!isValidObjectId(roomId)) {

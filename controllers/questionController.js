@@ -1,6 +1,7 @@
 import questionModel from "../models/questionModel.js";
 import examModel from "../models/examModel.js";
 import userModel from "../models/userModel.js";
+import { isValid, isValidObjectId } from "../utils/regex.js";
 
 // create Questions
 
@@ -27,6 +28,12 @@ export const getQuestions = async (req, res) => {
   try {
     const roomId = req.params.roomId;
     const count = 5;
+
+    if (!isValidObjectId(roomId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid roomId" });
+    }
 
     // Check if roomId already exists in any exam object
     const existingExam = await examModel.findOne({ roomId });
@@ -96,10 +103,8 @@ export const getSingleQuestion = async (req, res) => {
       });
     }
 
-    // Retrieve the question based on the specified index
     const question = exam.questions[questionIndex];
 
-    // Create a new object with only the desired properties
     const responseQuestion = {
       _id: question._id,
       question: question.question,

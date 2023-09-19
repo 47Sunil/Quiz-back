@@ -7,7 +7,7 @@ import { isValid, isValidObjectId } from "../utils/regex.js";
 
 export const createRoom = async (req, res) => {
   try {
-    const userId = req.user;
+    const { userId } = req.user;
     const { roomName } = req.body;
 
     if (!isValid(roomName)) {
@@ -58,7 +58,11 @@ export const createRoom = async (req, res) => {
 // get rooms
 
 export const lobby = async (req, res) => {
+  console.log("kjnnksf");
+
   try {
+    console.log("try");
+
     const roomsWithOnePlayer = await roomModel.find({
       user: { $size: 1 },
     });
@@ -69,7 +73,7 @@ export const lobby = async (req, res) => {
         message: "All rooms are booked. Create a new room player.",
       });
     }
-
+    console.log(roomsWithOnePlayer, "  roomsWithOnePlayer");
     return res.status(200).json({
       success: true,
       totalRooms: roomsWithOnePlayer.length,
@@ -87,7 +91,7 @@ export const lobby = async (req, res) => {
 
 export const joinRoom = async (req, res) => {
   try {
-    const userId = req.user;
+    const { userId } = req.user;
     const roomId = req.params.roomId;
     if (!isValidObjectId(roomId)) {
       return res
