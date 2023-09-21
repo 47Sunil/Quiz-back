@@ -12,6 +12,6 @@ const router = express.Router();
 router.route("/").post(isAuthenticated, trimRequest.all, createRoom);
 router.route("/lobby").get(isAuthenticated, lobby);
 router.route("/join/:roomId").patch(isAuthenticated, trimRequest.all, joinRoom);
-router.route("/:roomId").delete(exitRoom);
+router.route("/:examId").delete(isAuthenticated, exitRoom);
 
 export default router;

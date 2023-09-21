@@ -9,6 +9,6 @@ import { isAuthenticated } from "../middlewares/isAuth.js";
 const router = express.Router();
 
 router.route("/").post(isAuthenticated, trimRequest.all, answerQuestion);
-router.route("/report/:roomId").get(isAuthenticated, getUserReport);
+router.route("/report/:examId").get(isAuthenticated, getUserReport);
 
 export default router;

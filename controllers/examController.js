@@ -1,6 +1,7 @@
 import roomModel from "../models/roomModel.js";
 import questionModel from "../models/questionModel.js";
 import { isValid, isValidObjectId } from "../utils/regex.js";
+import examModel from "../models/examModel.js";
 
 // Answer questions
 
@@ -108,13 +109,26 @@ export const answerQuestion = async (req, res) => {
 export const getUserReport = async (req, res) => {
   try {
     const { userId } = req.user;
-    const roomId = req.params.roomId;
+    const examId = req.params.examId;
+    console.log(examId, "examId");
+    console.log(userId, "userId");
 
-    if (!isValidObjectId(roomId)) {
+    if (!isValidObjectId(examId)) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid roomId" });
+        .json({ success: false, message: "Invalid examId" });
     }
+
+    const exam = await examModel.findById(examId);
+
+    if (!exam) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam not found.",
+      });
+    }
+
+    const roomId = exam.roomId;
 
     const room = await roomModel.findById(roomId);
 

@@ -146,12 +146,41 @@ export const joinRoom = async (req, res) => {
 
 export const exitRoom = async (req, res) => {
   try {
-    const roomId = req.params.roomId;
+    const { userId } = req.user;
 
-    if (!isValidObjectId(roomId)) {
+    const examId = req.params.examId;
+
+    if (!isValidObjectId(examId)) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid roomId" });
+        .json({ success: false, message: "Invalid examId" });
+    }
+
+    const exam = await examModel.findById(examId);
+
+    if (!exam) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam not found.",
+      });
+    }
+
+    const roomId = exam.roomId;
+
+    const room = await roomModel.findById(roomId);
+
+    if (!room) {
+      return res.status(404).json({
+        success: false,
+        message: "Room not found.",
+      });
+    }
+
+    if (!room.user.includes(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized, User is not part of the room.",
+      });
     }
 
     const findRoom = await roomModel.findByIdAndDelete(roomId);
