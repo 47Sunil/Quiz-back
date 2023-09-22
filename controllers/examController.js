@@ -8,7 +8,19 @@ import examModel from "../models/examModel.js";
 export const answerQuestion = async (req, res) => {
   try {
     const { userId } = req.user;
-    const { roomId, questionId, selectedOption } = req.body;
+    const { examId, questionId, selectedOption } = req.body;
+    console.log({ examId, questionId, selectedOption });
+    const exam = await examModel.findById(examId);
+
+    // if (!exam) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "Exam not found.",
+    //   });
+    // }
+
+    const roomId = exam.roomId;
+    console.log({ roomId, questionId, selectedOption });
     if (!Object.keys(req.body).length) {
       return res.status(400).json({
         success: false,
@@ -36,7 +48,7 @@ export const answerQuestion = async (req, res) => {
 
     // Find the room by roomName
     const room = await roomModel.findById(roomId);
-
+    console.log({ room });
     if (!room) {
       return res.status(404).json({
         success: false,
@@ -45,7 +57,7 @@ export const answerQuestion = async (req, res) => {
     }
 
     // Check if the user is part of the room
-
+    console.log({ user: room.user, userId });
     if (!room.user.includes(userId)) {
       return res.status(403).json({
         success: false,
@@ -55,7 +67,7 @@ export const answerQuestion = async (req, res) => {
 
     // Find the user's metadata entry or create a new one if it doesn't exist
     let userMetadata = room.metadata.find((entry) => entry.user === userId);
-
+    console.log({ userMetadata });
     const question = await questionModel.findById(questionId);
     if (!question) {
       return res.status(404).json({
@@ -85,7 +97,7 @@ export const answerQuestion = async (req, res) => {
       selectedOption,
       correctAnswer: question.correctOption,
     });
-
+    console.log({ userMetadata });
     // Save the updated room document
     await room.save();
 
@@ -113,11 +125,11 @@ export const getUserReport = async (req, res) => {
     console.log(examId, "examId");
     console.log(userId, "userId");
 
-    if (!isValidObjectId(examId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid examId" });
-    }
+    // if (!isValidObjectId(examId)) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "Invalid examId" });
+    // }
 
     const exam = await examModel.findById(examId);
 
@@ -131,7 +143,7 @@ export const getUserReport = async (req, res) => {
     const roomId = exam.roomId;
 
     const room = await roomModel.findById(roomId);
-
+    console.log(room);
     if (!room) {
       return res.status(404).json({
         success: false,
@@ -149,15 +161,14 @@ export const getUserReport = async (req, res) => {
     const userScores = [];
 
     for (const userName of room.user) {
+      console.log({ userName, room: room.metadata });
       const userMetadata = room.metadata.find(
         (metadata) => metadata.user === userName
       );
+      console.log({ userMetadata });
 
       if (!userMetadata) {
-        return res.status(404).json({
-          success: false,
-          message: "User metadata not found for " + userName,
-        });
+        continue;
       }
 
       // Calculate the user's score
@@ -165,7 +176,7 @@ export const getUserReport = async (req, res) => {
 
       for (const response of userMetadata.responses) {
         const question = await questionModel.findById(response.questionId);
-
+        console.log({ response });
         if (!question) {
           return res.status(404).json({
             success: false,

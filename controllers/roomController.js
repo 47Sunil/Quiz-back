@@ -127,6 +127,8 @@ export const joinRoom = async (req, res) => {
       });
     }
 
+    console.log(findRoom, "findRoom");
+
     findRoom.user.push(userId);
     await findRoom.save();
     return res.status(200).json({
